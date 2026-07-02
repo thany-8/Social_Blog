@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="text-center p-5 rounded-4 shadow-sm bg-light">
+
+    <div class="mb-4" style="font-size: 5rem;">
+      🐾
+    </div>
+
+    <h1 class="display-1 fw-bold text-primary">
+      404
+    </h1>
+
+    <h2 class="fw-bold mb-3">
+      Oops! Page Not Found
+    </h2>
+
+    <p class="lead text-muted mb-4">
+      Looks like this page ran away like a little puppy.
+    </p>
+
+    <a href="{{ url_for('core.index') }}" class="btn btn-primary btn-lg rounded-pill px-4">
+      Go Back Home
+    </a>
+
+  </div>
+</section>
+
+{% endblock %}
