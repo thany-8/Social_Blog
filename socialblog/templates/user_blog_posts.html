@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="container my-5">
+
+  <h1 class="mb-4">Posts by {{ user.username }}</h1>
+
+  {% for post in blog_posts.items %}
+    <div class="card mb-3 shadow-sm">
+      <div class="card-body">
+        <h4 class="card-title">{{ post.title }}</h4>
+        <h6 class="card-subtitle mb-2 text-muted">{{ post.date.strftime('%Y-%m-%d') }}</h6>
+        <p class="card-text">{{ post.text }}</p>
+      </div>
+    </div>
+  {% else %}
+    <p class="text-muted">No posts yet.</p>
+  {% endfor %}
+
+</section>
+
+{% endblock %}
