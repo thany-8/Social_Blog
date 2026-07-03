@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="container my-5">
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+
+        <!-- Top banner -->
+        <div class="text-white text-center p-5"
+             style="background: linear-gradient(135deg, #667eea, #764ba2);">
+
+          <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_image) }}"
+               alt="Profile Picture"
+               class="rounded-circle border border-4 border-white shadow mb-3"
+               width="140"
+               height="140"
+               style="object-fit: cover;">
+
+          <h2 class="fw-bold mb-1">
+            Welcome to the page for {{ current_user.username }}
+          </h2>
+
+         
+         
+
+        </div>
+
+        <!-- Account info -->
+        <div class="card-body p-5">
+
+          <div class="text-center mb-4">
+            <h3 class="fw-bold">Account Information</h3>
+            <p class="text-muted">
+              Update your profile information and profile picture.
+            </p>
+          </div>
+
+          <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+              {{ form.username.label(class="form-label fw-semibold") }}
+              {{ form.username(class="form-control form-control-lg rounded-3", placeholder="Enter your username") }}
+
+              {% for error in form.username.errors %}
+                <small class="text-danger">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="mb-3">
+              {{ form.email.label(class="form-label fw-semibold") }}
+              {{ form.email(class="form-control form-control-lg rounded-3", placeholder="Enter your email") }}
+
+              {% for error in form.email.errors %}
+                <small class="text-danger">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="mb-4">
+              {{ form.picture.label(class="form-label fw-semibold") }}
+              {{ form.picture(class="form-control form-control-lg rounded-3") }}
+
+              {% for error in form.picture.errors %}
+                <small class="text-danger">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="d-grid">
+              {{ form.submit(class="btn btn-primary btn-lg rounded-pill") }}
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+{% endblock %}
