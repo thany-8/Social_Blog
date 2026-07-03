@@ -31,10 +31,12 @@
             {% if current_user.is_authenticated and current_user == post.author %}
             <a href="{{ url_for('blog_posts.update', blog_post_id=post.id) }}"
                class="btn btn-sm btn-outline-secondary rounded-pill ms-auto">Update</a>
-            <form action="{{ url_for('blog_posts.delete_post', blog_post_id=post.id) }}"
-                  method="POST" onsubmit="return confirm('Delete this post?');" class="d-inline">
-              <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">Delete</button>
-            </form>
+            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill"
+                    data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                    data-action="{{ url_for('blog_posts.delete_post', blog_post_id=post.id) }}"
+                    data-message="Delete this post? This can’t be undone.">
+              Delete
+            </button>
             {% endif %}
           </div>
 
@@ -74,10 +76,12 @@
             </div>
             <p class="mb-1" style="white-space: pre-wrap;">{{ comment.text }}</p>
             {% if current_user.is_authenticated and (current_user == comment.author or current_user == post.author) %}
-            <form action="{{ url_for('blog_posts.delete_comment', comment_id=comment.id) }}"
-                  method="POST" onsubmit="return confirm('Delete this comment?');">
-              <button type="submit" class="btn btn-sm btn-link text-danger p-0">Delete</button>
-            </form>
+            <button type="button" class="btn btn-sm btn-link text-danger p-0"
+                    data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                    data-action="{{ url_for('blog_posts.delete_comment', comment_id=comment.id) }}"
+                    data-message="Delete this comment?">
+              Delete
+            </button>
             {% endif %}
           </div>
           {% else %}
@@ -91,4 +95,37 @@
   </div>
 </section>
 
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold" id="confirmDeleteLabel">Please confirm</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="confirmDeleteMessage">Are you sure?</div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+        <form method="POST" id="confirmDeleteForm" class="d-inline">
+          <button type="submit" class="btn btn-danger rounded-pill">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var modal = document.getElementById('confirmDeleteModal');
+    if (!modal) return;
+    modal.addEventListener('show.bs.modal', function (event) {
+      var trigger = event.relatedTarget;
+      if (!trigger) return;
+      document.getElementById('confirmDeleteForm').setAttribute('action', trigger.getAttribute('data-action'));
+      document.getElementById('confirmDeleteMessage').textContent = trigger.getAttribute('data-message');
+    });
+  })();
+</script>
 {% endblock %}
