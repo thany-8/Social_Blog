@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-body p-5">
+
+          <h2 class="fw-bold text-center mb-4">
+            {% if title %}{{ title }} Post{% else %}Create Post{% endif %}
+          </h2>
+
+          <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+              {{ form.title.label(class="form-label fw-semibold") }}
+              {{ form.title(class="form-control form-control-lg rounded-3", placeholder="Post title") }}
+              {% for error in form.title.errors %}
+                <small class="text-danger">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="mb-4">
+              {{ form.text.label(class="form-label fw-semibold") }}
+              {{ form.text(class="form-control rounded-3", rows="10", placeholder="Write your story...") }}
+              {% for error in form.text.errors %}
+                <small class="text-danger">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="d-grid">
+              {{ form.submit(class="btn btn-primary btn-lg rounded-pill") }}
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

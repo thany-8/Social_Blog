@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <article class="card border-0 shadow-lg rounded-4">
+        <div class="card-body p-5">
+
+          <h1 class="fw-bold mb-2">{{ post.title }}</h1>
+          <p class="text-muted mb-4">
+            By
+            <a href="{{ url_for('users.user_posts', username=post.author.username) }}" class="text-decoration-none">
+              {{ post.author.username }}
+            </a>
+            on {{ post.date.strftime('%Y-%m-%d') }}
+          </p>
+
+          <p style="white-space: pre-wrap;">{{ post.text }}</p>
+
+          {% if current_user.is_authenticated and current_user == post.author %}
+          <div class="mt-4 d-flex gap-2">
+            <a href="{{ url_for('blog_posts.update', blog_post_id=post.id) }}"
+               class="btn btn-outline-secondary rounded-pill">Update</a>
+            <form action="{{ url_for('blog_posts.delete_post', blog_post_id=post.id) }}"
+                  method="POST" onsubmit="return confirm('Delete this post?');">
+              <button type="submit" class="btn btn-outline-danger rounded-pill">Delete</button>
+            </form>
+          </div>
+          {% endif %}
+
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
