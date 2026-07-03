@@ -1,6 +1,7 @@
 # CORE/ VIEW.PY
 
 from flask import redirect,render_template, request, Blueprint
+from socialblog.models import BlogPost
 
 core = Blueprint('core', __name__)
 
