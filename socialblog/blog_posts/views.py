@@ -1,8 +1,8 @@
 from flask import render_template,url_for,flash, redirect,request,Blueprint,abort
 from flask_login import current_user,login_required
 from socialblog import db
-from socialblog.models import BlogPost
-from socialblog.blog_posts.forms import BlogPostForm
+from socialblog.models import BlogPost, Comment, Like
+from socialblog.blog_posts.forms import BlogPostForm, CommentForm
 
 blog_posts = Blueprint('blog_posts',__name__)
 
@@ -31,8 +31,9 @@ def create_post():
 def blog_post(blog_post_id):
     # grab the requested blog post by id number or return 404
     blog_post = BlogPost.query.get_or_404(blog_post_id)
+    form = CommentForm()
     return render_template('blog_post.html',title=blog_post.title,
-                            date=blog_post.date,post=blog_post
+                            date=blog_post.date,post=blog_post,form=form
     )
 
 @blog_posts.route("/<int:blog_post_id>/update", methods=['GET', 'POST'])
@@ -69,3 +70,46 @@ def delete_post(blog_post_id):
     db.session.commit()
     flash('Post has been deleted')
     return redirect(url_for('core.index'))
+
+
+@blog_posts.route('/<int:blog_post_id>/comment', methods=['POST'])
+@login_required
+def add_comment(blog_post_id):
+    blog_post = BlogPost.query.get_or_404(blog_post_id)
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(text=form.text.data,
+                          user_id=current_user.id,
+                          blog_post_id=blog_post.id)
+        db.session.add(comment)
+        db.session.commit()
+        flash('Comment added')
+    return redirect(url_for('blog_posts.blog_post', blog_post_id=blog_post.id))
+
+
+@blog_posts.route('/comment/<int:comment_id>/delete', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    # Only the comment author or the post owner may delete a comment.
+    if current_user != comment.author and current_user != comment.post.author:
+        abort(403)
+    post_id = comment.blog_post_id
+    db.session.delete(comment)
+    db.session.commit()
+    flash('Comment deleted')
+    return redirect(url_for('blog_posts.blog_post', blog_post_id=post_id))
+
+
+@blog_posts.route('/<int:blog_post_id>/like', methods=['POST'])
+@login_required
+def like_post(blog_post_id):
+    blog_post = BlogPost.query.get_or_404(blog_post_id)
+    like = Like.query.filter_by(user_id=current_user.id,
+                                blog_post_id=blog_post.id).first()
+    if like:
+        db.session.delete(like)
+    else:
+        db.session.add(Like(user_id=current_user.id, blog_post_id=blog_post.id))
+    db.session.commit()
+    return redirect(request.referrer or url_for('blog_posts.blog_post', blog_post_id=blog_post.id))
