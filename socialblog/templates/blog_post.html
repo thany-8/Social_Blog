@@ -5,7 +5,7 @@
   <div class="row justify-content-center">
     <div class="col-lg-8">
 
-      <article class="card border-0 shadow-lg rounded-4">
+      <article class="card border-0 shadow-lg rounded-4 mb-4">
         <div class="card-body p-5">
 
           <h1 class="fw-bold mb-2">{{ post.title }}</h1>
@@ -19,19 +19,73 @@
 
           <p style="white-space: pre-wrap;">{{ post.text }}</p>
 
-          {% if current_user.is_authenticated and current_user == post.author %}
-          <div class="mt-4 d-flex gap-2">
-            <a href="{{ url_for('blog_posts.update', blog_post_id=post.id) }}"
-               class="btn btn-outline-secondary rounded-pill">Update</a>
-            <form action="{{ url_for('blog_posts.delete_post', blog_post_id=post.id) }}"
-                  method="POST" onsubmit="return confirm('Delete this post?');">
-              <button type="submit" class="btn btn-outline-danger rounded-pill">Delete</button>
+          <div class="d-flex align-items-center gap-2 mt-4">
+            <form action="{{ url_for('blog_posts.like_post', blog_post_id=post.id) }}" method="POST" class="d-inline">
+              <button type="submit"
+                      class="btn btn-sm rounded-pill {% if post.is_liked_by(current_user) %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                &#10084; {{ post.likes|length }}
+              </button>
             </form>
+            <span class="text-muted small">&#128172; {{ post.comments|length }}</span>
+
+            {% if current_user.is_authenticated and current_user == post.author %}
+            <a href="{{ url_for('blog_posts.update', blog_post_id=post.id) }}"
+               class="btn btn-sm btn-outline-secondary rounded-pill ms-auto">Update</a>
+            <form action="{{ url_for('blog_posts.delete_post', blog_post_id=post.id) }}"
+                  method="POST" onsubmit="return confirm('Delete this post?');" class="d-inline">
+              <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">Delete</button>
+            </form>
+            {% endif %}
           </div>
-          {% endif %}
 
         </div>
       </article>
+
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+          <h4 class="fw-bold mb-3">Comments ({{ post.comments|length }})</h4>
+
+          {% if current_user.is_authenticated %}
+          <form action="{{ url_for('blog_posts.add_comment', blog_post_id=post.id) }}" method="POST" class="mb-4">
+            {{ form.hidden_tag() }}
+            <div class="mb-2">
+              {{ form.text(class="form-control rounded-3", rows="3", placeholder="Write a comment...") }}
+              {% for error in form.text.errors %}
+                <small class="text-danger">{{ error }}</small>
+              {% endfor %}
+            </div>
+            {{ form.submit(class="btn btn-primary btn-sm rounded-pill") }}
+          </form>
+          {% else %}
+          <p class="text-muted">
+            <a href="{{ url_for('users.login') }}">Log in</a> to leave a comment.
+          </p>
+          {% endif %}
+
+          {% for comment in post.comments %}
+          <div class="border-top py-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <strong>
+                <a href="{{ url_for('users.user_posts', username=comment.author.username) }}" class="text-decoration-none">
+                  {{ comment.author.username }}
+                </a>
+              </strong>
+              <small class="text-muted">{{ comment.date.strftime('%Y-%m-%d %H:%M') }}</small>
+            </div>
+            <p class="mb-1" style="white-space: pre-wrap;">{{ comment.text }}</p>
+            {% if current_user.is_authenticated and (current_user == comment.author or current_user == post.author) %}
+            <form action="{{ url_for('blog_posts.delete_comment', comment_id=comment.id) }}"
+                  method="POST" onsubmit="return confirm('Delete this comment?');">
+              <button type="submit" class="btn btn-sm btn-link text-danger p-0">Delete</button>
+            </form>
+            {% endif %}
+          </div>
+          {% else %}
+          <p class="text-muted mb-0">No comments yet. Be the first!</p>
+          {% endfor %}
+
+        </div>
+      </div>
 
     </div>
   </div>
