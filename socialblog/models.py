@@ -9,8 +9,8 @@ def load_user(user_id):
 
 
 class User(db.Model, UserMixin):
-
-    __tablename__ = 'users'
+    
+    __tablename___= 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     profile_image = db.Column(db.String(20),nullable=False,default='default_profile.png')
@@ -19,7 +19,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128))
 
 
-    posts = db.relationship('BlogPost', backref='author', lazy=True)
+    posts = db.relationship('Blogpost', backref='author', lazy=True)
 
 
     def __init__(self, email, username, password):
@@ -27,16 +27,17 @@ class User(db.Model, UserMixin):
         self.username = username
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-    def __repr__(self):
-        return f"Username {self.username}"
-
+        def check_password(self,password):
+            return check_password_hash(self.password_hash, password)
+        
+        def __repr__(self):
+            return f"Username {username}"
+        
 
 
 
 class BlogPost(db.Model):
+    users = db.relationship(User)
 
     id = db.Column(db.Integer, primary_key = True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'),nullable=False)
@@ -47,7 +48,7 @@ class BlogPost(db.Model):
     text = db.Column(db.Text,nullable=False)
 
 
-    def __init__(self,title,text,user_id):
+    def __int__(self,title,text,user_id):
         self.title = title
         self.text = text
         self.user_id = user_id
