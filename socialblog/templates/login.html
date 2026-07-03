@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<section class="container d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+  <div class="col-md-6 col-lg-5">
+
+    <div class="card shadow-lg border-0 rounded-4">
+      <div class="card-body p-5">
+
+        <div class="text-center mb-4">
+          <h2 class="fw-bold">Create Account</h2>
+          <p class="text-muted">Join SocialBlog and start sharing your stories.</p>
+        </div>
+
+        <form method="POST">
+          {{ form.hidden_tag() }}
+
+          <div class="mb-3">
+            {{ form.email.label(class="form-label fw-semibold") }}
+            {{ form.email(class="form-control form-control-lg rounded-3", placeholder="Enter your email") }}
+
+            {% for error in form.email.errors %}
+              <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+          </div>
+
+        
+
+          <div class="mb-3">
+            {{ form.password.label(class="form-label fw-semibold") }}
+            {{ form.password(class="form-control form-control-lg rounded-3", placeholder="Create a password") }}
+
+            {% for error in form.password.errors %}
+              <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+          </div>
+
+
+          <div class="d-grid">
+            {{ form.submit(class="btn btn-primary btn-lg rounded-pill") }}
+          </div>
+        </form>
+
+        <div class="text-center mt-4">
+          <p class="text-muted mb-0">
+            Don't have an account?
+            <a href="{{url_for('register.html')}}" class="text-decoration-none fw-semibold">Register here</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
