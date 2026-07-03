@@ -8,13 +8,13 @@ from flask_wtf.file import FileAllowed, FileField
 from flask_login import current_user
 from socialblog.models import User
 
-class LogingForm(FlaskForm):
+class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Log In')
 
 
-class RegistrationFoprm(FlaskForm):
+class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired(),EqualTo('pass_confirm', message="Password must match")])
