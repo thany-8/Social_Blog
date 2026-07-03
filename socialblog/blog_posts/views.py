@@ -1,4 +1,4 @@
-from flask import render_template,url_for,flash, redirect,request,Blueprint
+from flask import render_template,url_for,flash, redirect,request,Blueprint,abort
 from flask_login import current_user,login_required
 from socialblog import db
 from socialblog.models import BlogPost
