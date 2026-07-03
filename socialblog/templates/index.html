@@ -1,26 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <section class="py-5 text-center text-white rounded-4 shadow"
+<section class="py-5 text-center text-white rounded-4 shadow"
          style="background: linear-gradient(135deg, #667eea, #764ba2);">
   <div class="container py-5">
-    <h1 class="display-3 fw-bold">
-      Welcome to SocialBlog
-    </h1>
+    <h1 class="display-3 fw-bold">Welcome to SocialBlog</h1>
 
     <p class="lead mt-3 mb-4">
       A place to write, share, and discover stories from people around the world.
     </p>
 
-    <a href="#" class="btn btn-light btn-lg px-4 me-2">
+    <a href="{{ url_for('blog_posts.create_post') }}" class="btn btn-light btn-lg px-4 me-2">
       Create Post
     </a>
 
-    <a href="#" class="btn btn-outline-light btn-lg px-4">
+    <a href="#posts" class="btn btn-outline-light btn-lg px-4">
       View Blogs
     </a>
   </div>
 </section>
 
+<section id="posts" class="container my-5">
+  <h2 class="fw-bold mb-4">Latest Posts</h2>
+
+  {% for post in blog_posts.items %}
+  <div class="card mb-3 shadow-sm border-0 rounded-4">
+    <div class="card-body">
+      <h4 class="card-title mb-1">
+        <a href="{{ url_for('blog_posts.blog_post', blog_post_id=post.id) }}" class="text-decoration-none">
+          {{ post.title }}
+        </a>
+      </h4>
+      <h6 class="card-subtitle mb-2 text-muted">
+        By
+        <a href="{{ url_for('users.user_posts', username=post.author.username) }}" class="text-decoration-none">
+          {{ post.author.username }}
+        </a>
+        on {{ post.date.strftime('%Y-%m-%d') }}
+      </h6>
+      <p class="card-text">{{ post.text[:200] }}{% if post.text|length > 200 %}…{% endif %}</p>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">No posts yet. Be the first to <a href="{{ url_for('blog_posts.create_post') }}">create one</a>!</p>
+  {% endfor %}
+</section>
 
 {% endblock %}
