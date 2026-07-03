@@ -28,7 +28,7 @@ def register():
                      password=form.password.data )
         
         db.session.add(user)
-        db.seesion.commit()
+        db.session.commit()
 
         #flash('Thank for registration')
 
@@ -40,10 +40,10 @@ def register():
 @users.route('/login',methods=['GET','POST'])
 def login():
     form = LoginForm()
-    if form.valite_on_submit():
+    if form.validate_on_submit():
 
         user = User.query.filter_by(email=form.email.data).first()
-        if user.check_password(form.password.data) and user is not None:
+        if user is not None and user.check_password(form.password.data):
 
             login_user(user)
             flash('Log in Success!')
@@ -73,9 +73,9 @@ def account():
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()
-        flash('User Acount Upadate!')
+        flash('User Account Updated!')
 
-        return redirect(url_for('user.account'))
+        return redirect(url_for('users.account'))
 
     elif request.method == 'GET':
         form.username.data = current_user.username
@@ -88,7 +88,7 @@ def account():
 @users.route('/<username>')
 
 def user_posts(username):
-    page = request.arg.get('page',1,type=int)
+    page = request.args.get('page',1,type=int)
     user = User.query.filter_by(username=username).first_or_404()
     blog_posts = BlogPost.query.filter_by(author=user).order_by(BlogPost.date.desc()).paginate(page=page,per_page=5)
 
