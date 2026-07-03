@@ -39,6 +39,7 @@
         on {{ post.date.strftime('%Y-%m-%d') }}
       </h6>
       <p class="card-text">{{ post.text[:200] }}{% if post.text|length > 200 %}…{% endif %}</p>
+      <div class="small text-muted mt-2">&#10084; {{ post.likes|length }} &nbsp;&middot;&nbsp; &#128172; {{ post.comments|length }}</div>
     </div>
   </div>
   {% else %}
