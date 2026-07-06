@@ -3,10 +3,17 @@ import os
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from socialblog.blog_posts.api import api_posts
+
+
 
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
+
+# register API blueprint AFTER app exists
+app.register_blueprint(api_posts)
 
 ##########################################################
 ################ DATABASE SETUP ##########################
