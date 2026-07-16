@@ -12,3 +12,7 @@ venv/
 
 # Environment / secrets
 .env
+
+# Demo build artifacts (generated video, server logs)
+demo/output/
+
