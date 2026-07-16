@@ -30,30 +30,15 @@ Write, share, and discover stories — complete with user profiles, profile pict
 
 ## 🎬 Demo
 
-> 📌 **These are placeholders.** Take your own screenshots, save them into [`docs/screenshots/`](docs/screenshots/), and swap the image links below (e.g. change the `src` to `docs/screenshots/home.png`).
+<div align="center">
 
-<table>
-  <tr>
-    <td width="50%">
-      <b>🏠 Home Feed</b><br/>
-      <img src="https://placehold.co/600x360/764ba2/ffffff?text=Home+Feed" alt="Home feed" />
-    </td>
-    <td width="50%">
-      <b>📖 Post · Likes &amp; Comments</b><br/>
-      <img src="https://placehold.co/600x360/667eea/ffffff?text=Post+%2B+Comments" alt="Post detail" />
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <b>🔐 Register / Login</b><br/>
-      <img src="https://placehold.co/600x360/667eea/ffffff?text=Register" alt="Register" />
-    </td>
-    <td width="50%">
-      <b>🧑‍🎨 Account &amp; Profile Picture</b><br/>
-      <img src="https://placehold.co/600x360/764ba2/ffffff?text=Account" alt="Account" />
-    </td>
-  </tr>
-</table>
+<img src="docs/demo.gif" alt="SocialBlog demo — browse the feed, register, log in, upload an avatar, publish a post, like and comment" width="800" />
+
+*Full walkthrough: browse the feed, register, log in, personalize your profile with an avatar, publish a post, then like and comment.*
+
+▶️ **[Watch the full-quality video](docs/socialblog_demo.mp4)**
+
+</div>
 
 ---
 
