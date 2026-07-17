@@ -3,6 +3,7 @@ from flask_login import current_user,login_required
 from socialblog import db
 from socialblog.models import BlogPost, Comment, Like
 from socialblog.blog_posts.forms import BlogPostForm, CommentForm
+from socialblog.moderation import moderate_comment
 
 blog_posts = Blueprint('blog_posts',__name__)
 
@@ -78,12 +79,20 @@ def add_comment(blog_post_id):
     blog_post = BlogPost.query.get_or_404(blog_post_id)
     form = CommentForm()
     if form.validate_on_submit():
+        result = moderate_comment(form.text.data)
+        if result.flagged:
+            flash(
+                f"Your comment was flagged as {result.reason} and was not posted. "
+                "Please keep things respectful and try again.",
+                "danger",
+            )
+            return redirect(url_for('blog_posts.blog_post', blog_post_id=blog_post.id))
         comment = Comment(text=form.text.data,
                           user_id=current_user.id,
                           blog_post_id=blog_post.id)
         db.session.add(comment)
         db.session.commit()
-        flash('Comment added')
+        flash('Comment added', 'success')
     return redirect(url_for('blog_posts.blog_post', blog_post_id=blog_post.id))
 
 

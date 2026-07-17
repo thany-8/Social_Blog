@@ -48,6 +48,7 @@ Write, share, and discover stories — complete with user profiles, profile pict
 - 🧑‍🎨 **User profiles** — upload a profile picture that's automatically resized (Pillow); supports JPG, JPEG, PNG, WebP, and GIF
 - ✍️ **Blog posts** — full create, read, update, and delete (CRUD), restricted to each post's author
 - 💬 **Comments** — any logged-in user can comment; a comment can be removed by its **author or the post owner**
+- 🛡️ **Comment moderation** — every comment is screened for toxicity **before it posts** via Google's free [Perspective API](https://perspectiveapi.com/), with an offline fallback so it works with zero setup
 - ❤️ **Likes** — one-click **toggle** like/unlike per user, with a live like count
 - 📄 **Pagination** — clean, paginated feeds on the home page and user pages
 - 🎨 **Modern UI** — responsive Bootstrap 5 design with a styled confirmation modal for deletes
@@ -66,6 +67,36 @@ Write, share, and discover stories — complete with user profiles, profile pict
 | **Database**  | SQLite (via SQLAlchemy ORM)                             |
 | **Frontend**  | Jinja2 templates, Bootstrap 5                           |
 | **Auth**      | Werkzeug password hashing, session-based login          |
+| **Moderation**| Google Perspective API (with offline keyword fallback)  |
+
+---
+
+## 🛡️ Content Moderation
+
+Comments are screened **before** they're saved, so toxic or abusive content
+never reaches the page.
+
+- **Primary engine — [Google Perspective API](https://perspectiveapi.com/):**
+  each comment is scored for `TOXICITY`, `SEVERE_TOXICITY`, `INSULT`,
+  `PROFANITY`, `THREAT`, and `IDENTITY_ATTACK`. If any score crosses its
+  threshold, the comment is rejected with a friendly message.
+- **Zero-config fallback:** with no `PERSPECTIVE_API_KEY` set (or if the API is
+  unreachable), a lightweight offline keyword screen keeps the app safe by
+  default — the feature works the moment you clone the repo.
+- **Fails open:** an unexpected moderation error never blocks commenting.
+
+Enable the full API with a free key:
+
+```bash
+export PERSPECTIVE_API_KEY="your-key"   # https://developers.perspectiveapi.com
+```
+
+Logic lives in [`socialblog/moderation.py`](socialblog/moderation.py); the tests
+mock the API so they run offline:
+
+```bash
+python -m unittest tests.test_moderation
+```
 
 ---
 
@@ -111,11 +142,14 @@ The app works out of the box, but you can override these via environment variabl
 | -------------- | -------------------------------------------------- | -------------------------------- |
 | `SECRET_KEY`   | Flask secret key used for sessions & CSRF          | a built-in dev key               |
 | `DATABASE_URL` | SQLAlchemy database URI                            | `sqlite:///socialblog/data.sqlite` |
+| `PERSPECTIVE_API_KEY` | Google Perspective API key that enables toxicity moderation | _offline fallback if unset_ |
+| `MODERATION_OFFLINE_FALLBACK` | Set to `0` to disable the offline keyword screen | `1` (enabled) |
 
 ```bash
 # Example
 export SECRET_KEY="a-long-random-string"
 export DATABASE_URL="sqlite:////absolute/path/to/data.sqlite"
+export PERSPECTIVE_API_KEY="your-perspective-api-key"   # optional, enables API moderation
 ```
 
 > 🔒 Always set a strong `SECRET_KEY` in production.
