@@ -121,10 +121,14 @@ source .venv/bin/activate          # Windows: .venv\Scripts\activate
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Create the database tables
+# 4. Configure your environment (SECRET_KEY is required; auto-loaded from .env)
+cp .env.example .env
+python -c "import secrets; print(secrets.token_hex(32))"   # paste as SECRET_KEY in .env
+
+# 5. Create the database tables
 flask --app app.py db upgrade
 
-# 5. Run the app
+# 6. Run the app
 python app.py
 ```
 
@@ -136,23 +140,28 @@ Then open **http://127.0.0.1:5000** in your browser. 🎉
 
 ## ⚙️ Configuration
 
-The app works out of the box, but you can override these via environment variables:
+Configuration is read from environment variables. A `.env` file at the project
+root is **auto-loaded** on startup (via `python-dotenv`), so the easiest setup is
+to copy the template and fill it in:
+
+```bash
+cp .env.example .env      # then edit .env
+```
 
 | Variable       | Description                                        | Default                          |
 | -------------- | -------------------------------------------------- | -------------------------------- |
-| `SECRET_KEY`   | Flask secret key used for sessions & CSRF          | a built-in dev key               |
+| `SECRET_KEY`   | Flask secret key used for sessions & CSRF          | **required** (no default)        |
 | `DATABASE_URL` | SQLAlchemy database URI                            | `sqlite:///socialblog/data.sqlite` |
 | `PERSPECTIVE_API_KEY` | Google Perspective API key that enables toxicity moderation | _offline fallback if unset_ |
 | `MODERATION_OFFLINE_FALLBACK` | Set to `0` to disable the offline keyword screen | `1` (enabled) |
 
+Generate a strong secret with:
+
 ```bash
-# Example
-export SECRET_KEY="a-long-random-string"
-export DATABASE_URL="sqlite:////absolute/path/to/data.sqlite"
-export PERSPECTIVE_API_KEY="your-perspective-api-key"   # optional, enables API moderation
+python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
-> 🔒 Always set a strong `SECRET_KEY` in production.
+> 🔒 `SECRET_KEY` is required — the app refuses to start without it. Never commit your real `.env`.
 
 ---
 

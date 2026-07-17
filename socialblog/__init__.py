@@ -1,14 +1,22 @@
 from flask import Flask
 import os
+from dotenv import load_dotenv
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
-
+# Load environment variables from a .env file at the project root, if present,
+# so SECRET_KEY and other config can live outside the shell and source control.
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env'))
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+if not app.config['SECRET_KEY']:
+    raise RuntimeError(
+        'SECRET_KEY is not set. Copy .env.example to .env and set a strong '
+        'SECRET_KEY (or export SECRET_KEY=...). See the README Configuration section.'
+    )
 
 
 ##########################################################
