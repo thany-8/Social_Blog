@@ -13,7 +13,7 @@ Write, share, and discover stories — complete with user profiles, profile pict
 ![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-3DA639?style=for-the-badge)
 
-[Features](#-features) • [Demo](#-demo) • [Getting Started](#-getting-started) • [Configuration](#️-configuration) • [Project Structure](#-project-structure) • [Roadmap](#️-roadmap)
+[Features](#-features) • [Security](#-security) • [Demo](#-demo) • [Getting Started](#-getting-started) • [Configuration](#️-configuration) • [Project Structure](#-project-structure) • [Roadmap](#️-roadmap)
 
 <!-- 📌 Replace this banner with your own image saved to docs/screenshots/banner.png -->
 <img src="https://placehold.co/1000x300/667eea/ffffff?text=SocialBlog" alt="SocialBlog banner" width="100%" />
@@ -68,6 +68,19 @@ Write, share, and discover stories — complete with user profiles, profile pict
 | **Frontend**  | Jinja2 templates, Bootstrap 5                           |
 | **Auth**      | Werkzeug password hashing, session-based login          |
 | **Moderation**| Google Perspective API (with offline keyword fallback)  |
+
+---
+
+## 🔒 Security
+
+Safety is built in at every layer — essential for a multi-user social app:
+
+- 🛡️ **Toxicity moderation** — every post and comment is screened for toxic or abusive language **before it's saved** (see the **Content Moderation** section below).
+- 🔑 **Hashed passwords** — credentials are never stored in plain text (Werkzeug password hashing).
+- 🛡️ **CSRF protection** — every form is guarded with Flask-WTF CSRF tokens.
+- 🔐 **Authorization checks** — only a post's author can edit or delete it, and a comment can be removed only by its author or the post owner (otherwise a `403`).
+- 🗝️ **No insecure defaults** — `SECRET_KEY` is **required** (the app refuses to start without it) and secrets load from a git-ignored `.env`, never committed.
+- 🧯 **Fails safe** — if the moderation API is unavailable a local screen still runs, and moderation errors never break posting or commenting.
 
 ---
 
