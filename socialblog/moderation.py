@@ -126,12 +126,13 @@ def _perspective_check(text, api_key):
     )
 
 
-def moderate_comment(text):
+def moderate_text(text):
     """Return a :class:`ModerationResult` for ``text``.
 
-    Uses the Perspective API when ``PERSPECTIVE_API_KEY`` is set, otherwise a
-    small offline keyword screen. Always fails open (``flagged=False``) on
-    unexpected errors so moderation never breaks commenting.
+    Works for any user content (blog posts or comments). Uses the Perspective
+    API when ``PERSPECTIVE_API_KEY`` is set, otherwise a small offline keyword
+    screen. Always fails open (``flagged=False``) on unexpected errors so
+    moderation never breaks posting or commenting.
     """
     if not text or not text.strip():
         return ModerationResult(flagged=False, source="none")

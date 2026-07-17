@@ -48,7 +48,7 @@ Write, share, and discover stories — complete with user profiles, profile pict
 - 🧑‍🎨 **User profiles** — upload a profile picture that's automatically resized (Pillow); supports JPG, JPEG, PNG, WebP, and GIF
 - ✍️ **Blog posts** — full create, read, update, and delete (CRUD), restricted to each post's author
 - 💬 **Comments** — any logged-in user can comment; a comment can be removed by its **author or the post owner**
-- 🛡️ **Comment moderation** — every comment is screened for toxicity **before it posts** via Google's free [Perspective API](https://perspectiveapi.com/), with an offline fallback so it works with zero setup
+- 🛡️ **Comment & post moderation** — every **post and comment** is screened for toxicity **before it's published** via Google's free [Perspective API](https://perspectiveapi.com/), with an offline fallback so it works with zero setup
 - ❤️ **Likes** — one-click **toggle** like/unlike per user, with a live like count
 - 📄 **Pagination** — clean, paginated feeds on the home page and user pages
 - 🎨 **Modern UI** — responsive Bootstrap 5 design with a styled confirmation modal for deletes
@@ -73,8 +73,8 @@ Write, share, and discover stories — complete with user profiles, profile pict
 
 ## 🛡️ Content Moderation
 
-Comments are screened **before** they're saved, so toxic or abusive content
-never reaches the page.
+Posts and comments are screened **before** they're saved, so toxic or abusive
+content never reaches the page.
 
 - **Primary engine — [Google Perspective API](https://perspectiveapi.com/):**
   each comment is scored for `TOXICITY`, `SEVERE_TOXICITY`, `INSULT`,

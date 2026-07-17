@@ -18,7 +18,7 @@ os.environ["DATABASE_URL"] = f"sqlite:///{_DB_PATH}"
 
 from socialblog import app, db  # noqa: E402
 from socialblog.models import BlogPost, Comment, User  # noqa: E402
-from socialblog.moderation import ModerationResult, moderate_comment  # noqa: E402
+from socialblog.moderation import ModerationResult, moderate_text  # noqa: E402
 
 
 def _perspective_response(scores):
@@ -35,29 +35,29 @@ def _perspective_response(scores):
 
 
 class ModerationEngineTests(unittest.TestCase):
-    """Unit tests for moderate_comment() across its code paths."""
+    """Unit tests for moderate_text() across its code paths."""
 
     def setUp(self):
         os.environ.pop("PERSPECTIVE_API_KEY", None)
 
     def test_offline_fallback_blocks_profanity(self):
-        result = moderate_comment("you are a piece of shit")
+        result = moderate_text("you are a piece of shit")
         self.assertTrue(result.flagged)
         self.assertEqual(result.source, "offline")
 
     def test_offline_fallback_allows_clean_text(self):
-        result = moderate_comment("what a lovely and thoughtful post")
+        result = moderate_text("what a lovely and thoughtful post")
         self.assertFalse(result.flagged)
         self.assertEqual(result.source, "offline")
 
     def test_empty_text_is_not_flagged(self):
-        self.assertFalse(moderate_comment("   ").flagged)
+        self.assertFalse(moderate_text("   ").flagged)
 
     @patch("socialblog.moderation.requests.post")
     def test_perspective_flags_toxic(self, mock_post):
         mock_post.return_value = _perspective_response({"TOXICITY": 0.97, "INSULT": 0.9})
         with patch.dict(os.environ, {"PERSPECTIVE_API_KEY": "test-key"}):
-            result = moderate_comment("horrible toxic garbage")
+            result = moderate_text("horrible toxic garbage")
         self.assertTrue(result.flagged)
         self.assertEqual(result.source, "perspective")
         self.assertIn("TOXICITY", result.tripped)
@@ -66,7 +66,7 @@ class ModerationEngineTests(unittest.TestCase):
     def test_perspective_allows_clean(self, mock_post):
         mock_post.return_value = _perspective_response({"TOXICITY": 0.03, "INSULT": 0.01})
         with patch.dict(os.environ, {"PERSPECTIVE_API_KEY": "test-key"}):
-            result = moderate_comment("great write-up, thanks for sharing!")
+            result = moderate_text("great write-up, thanks for sharing!")
         self.assertFalse(result.flagged)
         self.assertEqual(result.source, "perspective")
 
@@ -74,7 +74,7 @@ class ModerationEngineTests(unittest.TestCase):
            side_effect=requests.exceptions.ConnectionError("boom"))
     def test_perspective_error_falls_back_to_offline(self, mock_post):
         with patch.dict(os.environ, {"PERSPECTIVE_API_KEY": "test-key"}):
-            result = moderate_comment("totally clean comment")
+            result = moderate_text("totally clean comment")
         self.assertFalse(result.flagged)  # offline screen says clean
         self.assertEqual(result.source, "offline")
         self.assertIsNotNone(result.error)
@@ -84,8 +84,8 @@ class ModerationEngineTests(unittest.TestCase):
         self.assertEqual(result.reason, "toxic and insulting")
 
 
-class AddCommentModerationTests(unittest.TestCase):
-    """Integration tests for the /<id>/comment route."""
+class ContentModerationRouteTests(unittest.TestCase):
+    """Integration tests for moderation on the comment and post routes."""
 
     def setUp(self):
         app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)
@@ -110,7 +110,7 @@ class AddCommentModerationTests(unittest.TestCase):
         db.drop_all()
         self.ctx.pop()
 
-    @patch("socialblog.blog_posts.views.moderate_comment")
+    @patch("socialblog.blog_posts.views.moderate_text")
     def test_flagged_comment_is_blocked(self, mock_mod):
         mock_mod.return_value = ModerationResult(
             flagged=True, tripped=["TOXICITY"], source="perspective"
@@ -123,7 +123,7 @@ class AddCommentModerationTests(unittest.TestCase):
         self.assertEqual(Comment.query.count(), 0)
         self.assertIn(b"was not posted", resp.data)
 
-    @patch("socialblog.blog_posts.views.moderate_comment")
+    @patch("socialblog.blog_posts.views.moderate_text")
     def test_clean_comment_is_saved(self, mock_mod):
         mock_mod.return_value = ModerationResult(flagged=False, source="perspective")
         resp = self.client.post(
@@ -143,6 +143,29 @@ class AddCommentModerationTests(unittest.TestCase):
         )
         self.assertEqual(Comment.query.count(), 0)
         self.assertIn(b"was not posted", resp.data)
+
+    @patch("socialblog.blog_posts.views.moderate_text")
+    def test_flagged_post_is_blocked(self, mock_mod):
+        mock_mod.return_value = ModerationResult(
+            flagged=True, tripped=["TOXICITY"], source="perspective"
+        )
+        resp = self.client.post(
+            "/create", data={"title": "Nasty title", "text": "nasty body"},
+            follow_redirects=True,
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(BlogPost.query.filter_by(title="Nasty title").count(), 0)
+        self.assertIn(b"was not published", resp.data)
+
+    @patch("socialblog.blog_posts.views.moderate_text")
+    def test_clean_post_is_saved(self, mock_mod):
+        mock_mod.return_value = ModerationResult(flagged=False, source="perspective")
+        resp = self.client.post(
+            "/create", data={"title": "A clean post", "text": "friendly content"},
+            follow_redirects=True,
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(BlogPost.query.filter_by(title="A clean post").count(), 1)
 
 
 if __name__ == "__main__":

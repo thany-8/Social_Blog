@@ -3,7 +3,7 @@ from flask_login import current_user,login_required
 from socialblog import db
 from socialblog.models import BlogPost, Comment, Like
 from socialblog.blog_posts.forms import BlogPostForm, CommentForm
-from socialblog.moderation import moderate_comment
+from socialblog.moderation import moderate_text
 
 blog_posts = Blueprint('blog_posts',__name__)
 
@@ -14,13 +14,22 @@ def create_post():
 
     if form.validate_on_submit():
 
+        result = moderate_text(f"{form.title.data}\n{form.text.data}")
+        if result.flagged:
+            flash(
+                f"Your post was flagged as {result.reason} and was not published. "
+                "Please keep things respectful and try again.",
+                "danger",
+            )
+            return render_template('create_post.html', form=form)
+
         blog_post = BlogPost(title=form.title.data,
                              text=form.text.data,
                              user_id=current_user.id
                              )
         db.session.add(blog_post)
         db.session.commit()
-        flash("Blog Post Created")
+        flash("Blog Post Created", "success")
         return redirect(url_for('core.index'))
 
     return render_template('create_post.html',form=form)
@@ -47,10 +56,18 @@ def update(blog_post_id):
 
     form = BlogPostForm()
     if form.validate_on_submit():
+        result = moderate_text(f"{form.title.data}\n{form.text.data}")
+        if result.flagged:
+            flash(
+                f"Your changes were flagged as {result.reason} and were not saved. "
+                "Please keep things respectful and try again.",
+                "danger",
+            )
+            return render_template('create_post.html', title='Update', form=form)
         blog_post.title = form.title.data
         blog_post.text = form.text.data
         db.session.commit()
-        flash('Post Updated')
+        flash('Post Updated', "success")
         return redirect(url_for('blog_posts.blog_post', blog_post_id=blog_post.id))
     # Pass back the old blog post information so they can start again with
     # the old text and title.
@@ -79,7 +96,7 @@ def add_comment(blog_post_id):
     blog_post = BlogPost.query.get_or_404(blog_post_id)
     form = CommentForm()
     if form.validate_on_submit():
-        result = moderate_comment(form.text.data)
+        result = moderate_text(form.text.data)
         if result.flagged:
             flash(
                 f"Your comment was flagged as {result.reason} and was not posted. "
