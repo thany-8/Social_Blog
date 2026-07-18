@@ -161,7 +161,7 @@ flask --app app.py db upgrade
 python app.py
 ```
 
-Then open **http://127.0.0.1:5000** in your browser. 🎉
+Then open **https://social-blog-dmrg.onrender.com/** in your browser. 🎉
 
 > 💡 **macOS note:** port `5000` is used by *AirPlay Receiver*. If the server won't start, disable it in **System Settings → General → AirDrop & Handoff → AirPlay Receiver**, or run on another port with `flask --app app.py run --port 5001`.
 
