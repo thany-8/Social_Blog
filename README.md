@@ -13,7 +13,9 @@ Write, share, and discover stories — complete with user profiles, profile pict
 ![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-3DA639?style=for-the-badge)
 
-[Features](#-features) • [Security](#-security) • [Demo](#-demo) • [Getting Started](#-getting-started) • [Configuration](#️-configuration) • [Project Structure](#-project-structure) • [Roadmap](#️-roadmap)
+[Features](#-features) • [Security](#-security) • [Demo](#-demo) • [Try it](#-try-it-in-your-browser) • [Getting Started](#-getting-started) • [Configuration](#️-configuration) • [Project Structure](#-project-structure) • [Roadmap](#️-roadmap)
+
+<a href="https://codespaces.new/thany-8/Social_Blog"><img src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces" /></a>
 
 <!-- 📌 Replace this banner with your own image saved to docs/screenshots/banner.png -->
 <img src="https://placehold.co/1000x300/667eea/ffffff?text=SocialBlog" alt="SocialBlog banner" width="100%" />
@@ -39,6 +41,20 @@ Write, share, and discover stories — complete with user profiles, profile pict
 ▶️ **[Watch the full-quality video](docs/socialblog_demo.mp4)**
 
 </div>
+
+---
+
+## 🚀 Try it in your browser
+
+Don't want to clone anything? Run the **full app** in the cloud with **GitHub Codespaces** — nothing to download or install:
+
+<a href="https://codespaces.new/thany-8/Social_Blog"><img src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces" /></a>
+
+1. Click the badge above (or **Code → Codespaces → Create codespace on main**).
+2. Wait ~1 minute while it installs dependencies and seeds demo content.
+3. The app starts automatically and a browser tab opens on port **5000** — sign up and start posting.
+
+> Pre-seeded with sample users, posts, comments, and likes. Comment & post moderation runs with the built-in offline screen, so it works with **no API key**.
 
 ---
 
