@@ -5,6 +5,7 @@ from socialblog.models import User, BlogPost
 from socialblog.users.forms import RegistrationForm, LoginForm, UpdateUserForm
 from socialblog.users.picture_handler import add_profile_pic
 from flask import flash
+from werkzeug.security import generate_password_hash
 
 
 users = Blueprint('users',__name__)
@@ -23,14 +24,19 @@ def register():
 
 
     if form.validate_on_submit():
+        hashed_password = generate_password_hash(
+        form.password.data,
+        method="pbkdf2:sha256"
+        )
         user = User(email=form.email.data,
                     username=form.username.data,
-                     password=form.password.data )
+                    password_hash=hashed_password )
         
         db.session.add(user)
         db.session.commit()
 
         #flash('Thank for registration')
+        flash("Your account has been created!")
 
         return redirect(url_for('users.login'))
     
