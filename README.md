@@ -38,7 +38,6 @@ Write, share, and discover stories — complete with user profiles, profile pict
 
 *Full walkthrough: browse the feed, register, log in, personalize your profile with an avatar, publish a post, then like and comment.*
 
-▶️ **[Watch the full-quality video](docs/socialblog_demo.mp4)**
 
 </div>
 
