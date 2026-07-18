@@ -24,10 +24,10 @@ def register():
 
 
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data)
+       
         user = User(email=form.email.data,
                     username=form.username.data,
-                    password_hash=hashed_password)
+                    password=form.password.data)
         
         db.session.add(user)
         db.session.commit()
