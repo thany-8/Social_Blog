@@ -28,6 +28,9 @@
               {% for error in form.text.errors %}
                 <small class="text-danger">{{ error }}</small>
               {% endfor %}
+              <div data-island="moderation"
+                   data-inputs="title,text"
+                   data-api="{{ url_for('api_posts.moderate') }}"></div>
             </div>
 
             <div class="d-grid">

@@ -120,6 +120,14 @@ app.register_blueprint(api_posts)
 
 
 # --------------------------------------------------
+# FRONTEND (Vite/React islands)
+# --------------------------------------------------
+
+from socialblog import vite
+vite.init_app(app)
+
+
+# --------------------------------------------------
 # ENSURE TABLES EXIST ON RENDER
 # --------------------------------------------------
 # Render's managed PostgreSQL starts empty and the deploy does not run

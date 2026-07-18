@@ -20,13 +20,23 @@
           <p style="white-space: pre-wrap;">{{ post.text }}</p>
 
           <div class="d-flex align-items-center gap-2 mt-4">
-            <form action="{{ url_for('blog_posts.like_post', blog_post_id=post.id) }}" method="POST" class="d-inline">
-              <button type="submit"
-                      class="btn btn-sm rounded-pill {% if post.is_liked_by(current_user) %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                &#10084; {{ post.likes|length }}
-              </button>
-            </form>
-            <span class="text-muted small">&#128172; {{ post.comments|length }}</span>
+            <div class="d-inline"
+                 data-island="like-button"
+                 data-api="{{ url_for('api_posts.like_toggle', post_id=post.id) }}"
+                 data-login="{{ url_for('users.login') }}"
+                 data-count="{{ post.likes|length }}"
+                 data-liked="{{ 'true' if post.is_liked_by(current_user) else 'false' }}"
+                 data-authed="{{ 'true' if current_user.is_authenticated else 'false' }}">
+            </div>
+            <noscript>
+              <form action="{{ url_for('blog_posts.like_post', blog_post_id=post.id) }}" method="POST" class="d-inline">
+                <button type="submit"
+                        class="btn btn-sm rounded-pill {% if post.is_liked_by(current_user) %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                  &#10084; {{ post.likes|length }}
+                </button>
+              </form>
+            </noscript>
+            <span class="text-muted small">&#128172; <span data-comment-count>{{ post.comments|length }}</span></span>
 
             {% if current_user.is_authenticated and current_user == post.author %}
             <a href="{{ url_for('blog_posts.update', blog_post_id=post.id) }}"
@@ -45,18 +55,25 @@
 
       <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-4">
-          <h4 class="fw-bold mb-3">Comments ({{ post.comments|length }})</h4>
+          <h4 class="fw-bold mb-3">Comments (<span data-comment-count>{{ post.comments|length }}</span>)</h4>
 
           {% if current_user.is_authenticated %}
-          <form action="{{ url_for('blog_posts.add_comment', blog_post_id=post.id) }}" method="POST" class="mb-4">
+          <form id="comment-form"
+                action="{{ url_for('blog_posts.add_comment', blog_post_id=post.id) }}"
+                method="POST" class="mb-4"
+                data-api="{{ url_for('api_posts.add_comment_api', post_id=post.id) }}">
             {{ form.hidden_tag() }}
             <div class="mb-2">
-              {{ form.text(class="form-control rounded-3", rows="3", placeholder="Write a comment...") }}
+              {{ form.text(class="form-control rounded-3", rows="3", placeholder="Write a comment...", id="text") }}
               {% for error in form.text.errors %}
                 <small class="text-danger">{{ error }}</small>
               {% endfor %}
+              <div data-island="moderation"
+                   data-inputs="text"
+                   data-api="{{ url_for('api_posts.moderate') }}"></div>
             </div>
             {{ form.submit(class="btn btn-primary btn-sm rounded-pill") }}
+            <span id="comment-form-island" class="ms-2 align-middle"></span>
           </form>
           {% else %}
           <p class="text-muted">
@@ -64,6 +81,7 @@
           </p>
           {% endif %}
 
+          <div id="comment-list">
           {% for comment in post.comments %}
           <div class="border-top py-3">
             <div class="d-flex justify-content-between align-items-center">
@@ -84,9 +102,11 @@
             </button>
             {% endif %}
           </div>
-          {% else %}
-          <p class="text-muted mb-0">No comments yet. Be the first!</p>
           {% endfor %}
+          </div>
+          {% if not post.comments %}
+          <p class="text-muted mb-0" id="comments-empty">No comments yet. Be the first!</p>
+          {% endif %}
 
         </div>
       </div>
