@@ -16,3 +16,7 @@ venv/
 # Demo build artifacts (generated video, server logs)
 demo/output/
 
+# Node / frontend build
+frontend/node_modules/
+
+
