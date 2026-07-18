@@ -117,3 +117,15 @@ app.register_blueprint(users)
 app.register_blueprint(error_pages)
 app.register_blueprint(blog_posts)
 app.register_blueprint(api_posts)
+
+
+# --------------------------------------------------
+# ENSURE TABLES EXIST ON RENDER
+# --------------------------------------------------
+# Render's managed PostgreSQL starts empty and the deploy does not run
+# migrations, so create any missing tables on boot. This runs only on Render
+# (RENDER=true is set automatically there); locally we manage the schema with
+# `flask db upgrade`, so it never interferes with Alembic migrations.
+if os.environ.get("RENDER") == "true":
+    with app.app_context():
+        db.create_all()
