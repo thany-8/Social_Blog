@@ -65,6 +65,7 @@ Don't want to clone anything? Run the **full app** in the cloud with **GitHub Co
 - 💬 **Comments** — any logged-in user can comment; a comment can be removed by its **author or the post owner**
 - 🛡️ **Comment & post moderation** — every **post and comment** is screened for toxicity **before it's published** via Google's free [Perspective API](https://perspectiveapi.com/), with an offline fallback so it works with zero setup
 - ❤️ **Likes** — one-click **toggle** like/unlike per user, with a live like count
+- ⚛️ **React interactivity** — polished React "islands" enhance the server-rendered pages: live toxicity preview as you type, async likes and comments (no page reload), and toast notifications
 - 📄 **Pagination** — clean, paginated feeds on the home page and user pages
 - 🎨 **Modern UI** — responsive Bootstrap 5 design with a styled confirmation modal for deletes
 - 🧭 **Custom error pages** — friendly `403` and `404` screens
@@ -77,10 +78,10 @@ Don't want to clone anything? Run the **full app** in the cloud with **GitHub Co
 | Layer         | Technology                                              |
 | ------------- | ------------------------------------------------------- |
 | **Backend**   | Flask, Flask-SQLAlchemy, Flask-Login, Flask-Migrate     |
+| **Frontend**  | React 18 islands (Vite build) over Jinja2 + Bootstrap 5 |
 | **Forms**     | Flask-WTF, WTForms, email-validator                     |
 | **Images**    | Pillow                                                  |
-| **Database**  | SQLite (via SQLAlchemy ORM)                             |
-| **Frontend**  | Jinja2 templates, Bootstrap 5                           |
+| **Database**  | SQLite (dev) / PostgreSQL (production on Render)         |
 | **Auth**      | Werkzeug password hashing, session-based login          |
 | **Moderation**| Google Perspective API (with offline keyword fallback)  |
 
@@ -125,6 +126,38 @@ mock the API so they run offline:
 ```bash
 python -m unittest tests.test_moderation
 ```
+
+---
+
+## ⚛️ Frontend (React islands)
+
+The pages are server-rendered with Jinja2 + Bootstrap, then progressively
+enhanced with small **React 18 "islands"** built by **Vite**. This keeps the app
+fast and SEO-friendly while adding a modern, app-like feel:
+
+- **Live toxicity preview** — as you type a post or comment, a debounced call to
+  `/api/moderate` shows a real-time "Looks respectful ✓" / "May be flagged ⚠"
+  pill.
+- **Async likes** — like/unlike updates instantly without a page reload.
+- **Async comments** — comments post and appear in place, no reload.
+- **Toast notifications** — server flash messages and client actions surface as
+  elegant toasts.
+
+Each island mounts onto a `data-island="…"` element, so pages still work if
+JavaScript is disabled (forms fall back to normal submits). Flask injects the
+hashed bundle via a manifest ([`socialblog/vite.py`](socialblog/vite.py)).
+
+**Develop / rebuild the frontend:**
+
+```bash
+cd frontend
+npm install
+npm run build      # outputs to socialblog/static/dist/ (committed so Render needs no Node)
+npm run dev        # optional: Vite dev server with HMR
+```
+
+> The built bundle in `socialblog/static/dist/` is committed, so the deployed
+> app (and Codespaces) serves it directly — no Node step required in production.
 
 ---
 
@@ -221,23 +254,32 @@ Social_Blog_Flask/
 ├── app.py                       # Application entry point
 ├── requirements.txt             # Python dependencies
 ├── migrations/                  # Alembic database migrations
+├── frontend/                    # React islands source (Vite)
+│   ├── package.json
+│   ├── vite.config.js
+│   └── src/                     # main.jsx + components (LikeButton, etc.)
 ├── docs/screenshots/            # 📸 Put your README images here
 └── socialblog/
     ├── __init__.py              # App setup, config & blueprint registration
     ├── models.py                # User, BlogPost, Comment, Like models
+    ├── moderation.py            # Perspective API toxicity screening
+    ├── vite.py                  # Injects the built React bundle into templates
     ├── core/                    # Home & info pages
     │   └── views.py
     ├── users/                   # Auth, profiles & picture upload
     │   ├── forms.py
     │   ├── views.py
     │   └── picture_handler.py
-    ├── blog_posts/              # Posts, comments & likes
+    ├── blog_posts/              # Posts, comments, likes & JSON API
     │   ├── forms.py
-    │   └── views.py
+    │   ├── views.py
+    │   └── api.py
     ├── error_pages/             # 403 / 404 handlers
     │   └── handlers.py
     ├── templates/               # Jinja2 templates (Bootstrap 5)
-    └── static/profile_pics/     # Uploaded profile images
+    └── static/
+        ├── dist/                # Built React bundle (committed)
+        └── profile_pics/        # Uploaded profile images
 ```
 
 ---
